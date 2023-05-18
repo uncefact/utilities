@@ -5,9 +5,11 @@ on:
     inputs:
       tag:
         description: 'Annotated tag name'
+        type: string
         required: true
       message:
         description: 'Annotated tag message'
+        type: string
         required: true
 
 jobs:
