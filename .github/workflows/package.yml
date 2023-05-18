@@ -3,13 +3,12 @@ name: package
 on:
   workflow_call:
     inputs:
-      inputs:
-        tag:
-          description: 'Annotated tag name'
-          required: true
-        message:
-          description: 'Annotated tag message'
-          required: true
+      tag:
+        description: 'Annotated tag name'
+        required: true
+      message:
+        description: 'Annotated tag message'
+        required: true
 
 jobs:
   create_tag:
