@@ -1,6 +1,7 @@
 package org.unece.uncefact.vocab;
 
 import javax.json.*;
+import javax.json.stream.JsonParsingException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,7 +37,12 @@ public class JsonLDMerge {
             }
 
             JsonReader reader = Json.createReader(fis);
-            JsonObject vocabulary = reader.readObject();
+            JsonObject vocabulary = null;
+            try {
+                vocabulary = reader.readObject();
+            } catch (JsonParsingException e){
+                System.err.println(String.format("Can't parse the file %s.", domain));
+            }
             JsonObject contextObject = vocabulary.getJsonObject("@context");
             for (String key:contextObject.keySet()){
                 context.add(key, contextObject.get(key));
