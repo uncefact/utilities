@@ -247,7 +247,8 @@ public class DomainsToMD {
                         JsonArray cefactElementMetadata = dataTypeProperty.getJsonArray(Constants.UNECE_NS+":cefactElementMetadata");
                         if(cefactElementMetadata!=null) {
                             for (JsonObject metadata : cefactElementMetadata.getValuesAs(JsonObject.class)) {
-                                if (metadata.getString("unece:domainName").equalsIgnoreCase(jsonObject.getString(Constants.RDFS_LABEL))) {
+                                if (metadata.keySet().contains(Constants.UNECE_NS+":domainName")
+                                    && metadata.getString(Constants.UNECE_NS+":domainName").equalsIgnoreCase(jsonObject.getString(Constants.RDFS_LABEL))) {
                                     JsonValue comment = metadata.get(Constants.RDFS_COMMENT);
                                     mdDataTypeProperty.add("comment", comment);
                                 }
@@ -282,7 +283,8 @@ public class DomainsToMD {
                             JsonArray cefactElementMetadata = dataTypeProperty.getJsonArray(Constants.UNECE_NS+":cefactElementMetadata");
                             if (cefactElementMetadata!=null) {
                                 for (JsonObject metadata : cefactElementMetadata.getValuesAs(JsonObject.class)) {
-                                    if (metadata.getString("unece:domainName").equalsIgnoreCase(jsonObject.getString(Constants.RDFS_LABEL))) {
+                                    if (metadata.keySet().contains(Constants.UNECE_NS+":domainName")
+                                     && metadata.getString(Constants.UNECE_NS+":domainName").equalsIgnoreCase(jsonObject.getString(Constants.RDFS_LABEL))) {
                                         JsonValue comment = metadata.get(Constants.RDFS_COMMENT);
                                         mdDataTypeProperty.add("comment", comment);
                                     }
@@ -483,7 +485,18 @@ public class DomainsToMD {
             batchObject.add("id", dataSet.concat("_").concat(jsonObject.getString(Constants.ID)));
             JsonObjectBuilder batchFieldsObject = Json.createObjectBuilder();
             batchFieldsObject.add("label", jsonObject.getString(Constants.RDFS_LABEL));
-            batchFieldsObject.add("comment", jsonObject.getString(Constants.RDFS_COMMENT));
+            JsonValue classComment = jsonObject.get(Constants.RDFS_COMMENT);
+            String commentStr = "";
+            if(classComment instanceof JsonString){
+                commentStr = ((JsonString) classComment).getString();
+            } else if (classComment instanceof JsonArray) {
+                JsonArray commentsArray = classComment.asJsonArray();
+                for (JsonString comment:commentsArray.getValuesAs(JsonString.class)){
+                    commentStr = commentStr.concat(comment.getString()).concat(" ");
+                }
+
+            }
+            batchFieldsObject.add("comment", commentStr);
             batchFieldsObject.add("type", "Data Property");
             batchFieldsObject.add("dataset", dataSet);
             batchObject.add("fields", batchFieldsObject.build());
