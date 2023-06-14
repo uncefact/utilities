@@ -34,27 +34,16 @@ jobs:
         with:
           ref: refs/tags/${{ github.event.inputs.tag }}
 
-      - name: package merge utility
-        working-directory: jsonld-merge/
+      - name: package jsonld utility
+        working-directory: jsonld-utility/
         run: |
           mvn -B package --file pom.xml
 
-      - name: upload merge utility
+      - name: upload jsonld utility
         uses: actions/upload-artifact@v3
         with:
-          name: vocab-jsonld-merge
-          path: jsonld-merge/target/vocab-jsonld-merge-*.jar
-
-      - name: package md utility
-        working-directory: jsonld-to-md/
-        run: |
-          mvn -B package --file pom.xml
-
-      - name: upload md utility
-        uses: actions/upload-artifact@v3
-        with:
-          name: vocab-md-generation
-          path: jsonld-to-md/target/vocab-md-generation-*.jar
+          name: vocab-jsonld-utility
+          path: jsonld-utility/target/vocab-jsonld-utility-*.jar
 
   release_tag:
     needs:
@@ -67,16 +56,10 @@ jobs:
         with:
           ref: refs/tags/${{ github.event.inputs.tag }}
 
-      - name: Get merge utility
+      - name: Get jsonld utility
         uses: actions/download-artifact@v3
         with:
-          name: vocab-jsonld-merge
-          path: ./
-
-      - name: Get md utility
-        uses: actions/download-artifact@v3
-        with:
-          name: vocab-md-generation
+          name: vocab-jsonld-utility
           path: ./
 
       - name: Create Releases
