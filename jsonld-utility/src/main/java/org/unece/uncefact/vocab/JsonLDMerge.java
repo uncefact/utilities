@@ -33,7 +33,7 @@ public class JsonLDMerge {
             Map<String, JsonObject> items = new HashMap<>();
             JsonObjectBuilder context = Json.createObjectBuilder();
             for (String domain : domains) {
-                String domainName = StringUtils.substringBetween(domain, "vocab/", ".jsonld");
+                String domainName = StringUtils.substringBetween(domain, workingDir, ".jsonld");
                 InputStream fis = null;
                 try {
                     fis = new FileInputStream(domain);
@@ -61,7 +61,7 @@ public class JsonLDMerge {
                     if (items.containsKey(id)) {
                         System.err.println(String.format("Vocabulary already contains %s resource", id));
                     } else {
-                        objectBuilder.add("unece:domain", domainName);
+                        objectBuilder.add(Constants.UNECE_BUSINESS_DOMAIN, domainName);
                         items.put(id, objectBuilder.build());
                     }
                 }

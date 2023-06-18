@@ -33,6 +33,7 @@ public class DomainsToMD {
         Map<String, Map<String, JsonObject>> codeProperties = new TreeMap<>();
         Map<String, String> classesCommentsMap = new TreeMap<>();
         Map<String, String> codeListsCommentsMap = new TreeMap<>();
+        Map<String, String> codeListsDomainsMap = new TreeMap<>();
         Map<String, TreeMap<String, JsonObject>> codeListsReferrencedByMap = new TreeMap<>();
         JsonArrayBuilder batchArrayBuilder = Json.createArrayBuilder();
         Map<String, String> uniqueIDsCheck = new HashMap();
@@ -219,6 +220,8 @@ public class DomainsToMD {
             mdClass.add("label", jsonObject.getString(Constants.RDFS_LABEL));
             mdClass.add("uri", jsonObject.getString(Constants.ID));
             mdClass.add("comment", jsonObject.get(Constants.RDFS_COMMENT));
+            if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
+                mdClass.add("businessDomain", jsonObject.get(Constants.UNECE_BUSINESS_DOMAIN));
 
             JsonValue classComment = jsonObject.get(Constants.RDFS_COMMENT);
             if(classComment instanceof JsonString){
@@ -414,6 +417,8 @@ public class DomainsToMD {
 
             if (codeProperties.containsKey(jsonObject.getString(Constants.ID))){
                 codeListsCommentsMap.put(jsonObject.getString(Constants.ID), jsonObject.getString(Constants.RDFS_COMMENT));
+                if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
+                    codeListsDomainsMap.put(jsonObject.getString(Constants.ID), jsonObject.getString(Constants.UNECE_BUSINESS_DOMAIN));
                 codeListsReferrencedByMap.put(jsonObject.getString(Constants.ID), referencedBySet);
             }
 
@@ -510,6 +515,8 @@ public class DomainsToMD {
             mdProperty.add("label", jsonObject.getString(Constants.RDFS_LABEL));
             mdProperty.add("uri", jsonObject.getString(Constants.ID));
             mdProperty.add("comment", jsonObject.get(Constants.RDFS_COMMENT));
+            if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
+                mdProperty.add("businessDomain", jsonObject.get(Constants.UNECE_BUSINESS_DOMAIN));
 
             JsonValue rangeIncludes = jsonObject.get(Constants.SCHEMA_RANGE_INCLUDES);
             JsonArrayBuilder mdRangeIncludes = Json.createArrayBuilder();
@@ -611,6 +618,8 @@ public class DomainsToMD {
             mdProperty.add("label", jsonObject.getString(Constants.RDFS_LABEL));
             mdProperty.add("uri", jsonObject.getString(Constants.ID));
             mdProperty.add("comment", jsonObject.get(Constants.RDFS_COMMENT));
+            if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
+                mdProperty.add("businessDomain", jsonObject.get(Constants.UNECE_BUSINESS_DOMAIN));
 
             JsonArrayBuilder mdRangeIncludes = Json.createArrayBuilder();
             JsonValue rangeIncludes = jsonObject.get(Constants.SCHEMA_RANGE_INCLUDES);
@@ -683,6 +692,8 @@ public class DomainsToMD {
             mdCodelist.add("label", label);
             mdCodelist.add("uri", codeListId);
             mdCodelist.add("comment", codeListsCommentsMap.get(codeListId));
+            if (codeListsDomainsMap.containsKey(codeListId))
+                mdCodelist.add("businessDomain", codeListsDomainsMap.containsKey(codeListId));
 
             JsonObjectBuilder batchObject = Json.createObjectBuilder();
             batchObject.add("type", "add");
