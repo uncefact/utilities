@@ -38,6 +38,7 @@ public class DomainsToMD {
         JsonArrayBuilder batchArrayBuilder = Json.createArrayBuilder();
         Map<String, String> uniqueIDsCheck = new HashMap();
         JsonObjectBuilder combinedVocabulary = Json.createObjectBuilder();
+        JsonObjectBuilder combinedContext = Json.createObjectBuilder();
         JsonObject context = null;
         Map<String, JsonObjectBuilder> contextItemsMap = new HashMap<>();
         JsonArrayBuilder combinedGraphVocabulary = Json.createArrayBuilder();
@@ -72,7 +73,7 @@ public class DomainsToMD {
                 JsonValue type = jsonObject.get("@type");
                 if (uniqueIDsCheck.keySet().contains(jsonObject.getString(Constants.ID))){
 /*
-                    throw new RuntimeException(String.format("Non-unique URI %s", jsonObject.getString(Transformer.ID)));
+                    throw new RuntimeException(String.format("Non-unique URI %s", jsonObject.getString(Constants.ID)));
 */
                     System.err.println(String.format("Non-unique URI %s exists in two domains - %s and %s",
                             jsonObject.getString(Constants.ID),
@@ -84,107 +85,68 @@ public class DomainsToMD {
                 }
                 String typeValue = "";
                 String id = jsonObject.getString(Constants.ID);
-                JsonObjectBuilder item = Json.createObjectBuilder();
+
+                if (type == null){
+                    System.err.println(String.format("@type isn't defined for %s", id));
+                }
+
                 if (type instanceof JsonArray) {
                     JsonArray typeArray = (JsonArray) type;
+                    ArrayList types = new ArrayList();
                     for (int i = 0; i < typeArray.size(); i++) {
-                        switch (((JsonString) typeArray.get(i)).getString()) {
-                            case "rdfs:Class":
-                                classes.put(id, jsonObject);
-                                classNamesLowerCased.add(id.toLowerCase());
-/*
-                                item.add(Transformer.ID, id);
-                                contextItemsMap.put(id, item);
-*/
-                                break;
-                            case "owl:DatatypeProperty":
-                                dataTypeProperties.put(jsonObject.getString(Constants.ID), jsonObject);
-/*
-                                item.add(Transformer.ID, id);
-                                item.add(Transformer.TYPE, jsonObject.getJsonObject(Transformer.SCHEMA_RANGE_INCLUDES)
-                                        .getString(Transformer.ID));
-                                contextItemsMap.put(id, item);
-*/
-                                break;
-                            case "owl:ObjectProperty":
-                                objectsProperties.put(jsonObject.getString(Constants.ID), jsonObject);
-/*
-                                item.add(Transformer.ID, id);
-                                item.add(Transformer.TYPE, Transformer.ID);
-                                contextItemsMap.put(id, item);
-*/
-                                break;
-                            default:
-                                if (jsonObject.containsKey(Constants.RDF_VALUE)) {
-                                    String codeListId = StringUtils.substringBeforeLast(jsonObject.getString(Constants.ID), "#");
-                                    Map<String, JsonObject> codeListValues = null;
-                                    if (codeProperties.containsKey(codeListId)) {
-                                        codeListValues = codeProperties.get(codeListId);
-                                    } else {
-                                        codeListValues = new TreeMap<>();
-                                    }
-                                    codeListValues.put(jsonObject.getString(Constants.ID), jsonObject);
-                                    codeProperties.put(codeListId, codeListValues);
-                                }
-                                break;
-
-                        }
+                        types.add(((JsonString) typeArray.get(i)).getString());
+                    }
+                    if (types.contains("owl:DatatypeProperty")){
+                        typeValue = "owl:DatatypeProperty";
+                    } else if (types.contains("owl:ObjectProperty")){
+                        typeValue = "owl:ObjectProperty";
+                    } else {
+                        typeValue = types.get(0).toString();
                     }
                 } else {
-                    if (type == null){
-                        System.err.println(String.format("@type isn't defined for %s", jsonObject.getString(Constants.ID)));
-                    }
                     typeValue = ((JsonString) type).getString();
-                    switch (typeValue) {
-                        case "rdfs:Class":
-                            classes.put(id, jsonObject);
-                            classNamesLowerCased.add(id.toLowerCase());
-/*
-                            item.add(Transformer.ID, id);
-                            contextItemsMap.put(id, item);
-*/
-                            break;
-                        case "owl:DatatypeProperty":
-                            dataTypeProperties.put(jsonObject.getString(Constants.ID), jsonObject);
-/*
-                            item.add(Transformer.ID, id);
-                            item.add(Transformer.TYPE, jsonObject.getJsonObject(Transformer.SCHEMA_RANGE_INCLUDES)
-                                    .getString(Transformer.ID));
-                            contextItemsMap.put(id, item);
-*/
-                            break;
-                        case "owl:ObjectProperty":
-                            objectsProperties.put(jsonObject.getString(Constants.ID), jsonObject);
-/*
-                            item.add(Transformer.ID, id);
-                            item.add(Transformer.TYPE, Transformer.ID);
-                            contextItemsMap.put(id, item);
-*/
-                            break;
-                        case "rdf:Property":
-                            dataTypeProperties.put(jsonObject.getString(Constants.ID), jsonObject);
-/*
-                            item.add(Transformer.ID, id);
-                            item.add(Transformer.TYPE, jsonObject.getJsonObject(Transformer.SCHEMA_RANGE_INCLUDES)
-                                    .getString(Transformer.ID));
-                            contextItemsMap.put(id, item);
-*/
-                            break;
-                        default:
-                            if (jsonObject.containsKey(Constants.RDF_VALUE)) {
-                                String codeListId = StringUtils.substringBeforeLast(jsonObject.getString(Constants.ID), "#");
-                                Map<String, JsonObject> codeListValues = null;
-                                if (codeProperties.containsKey(codeListId)) {
-                                    codeListValues = codeProperties.get(codeListId);
-                                } else {
-                                    codeListValues = new TreeMap<>();
-                                }
-                                codeListValues.put(jsonObject.getString(Constants.ID), jsonObject);
-                                codeProperties.put(codeListId, codeListValues);
-                            }
-                            break;
+                }
 
+                String contextItemType = Constants.ID;
+                if (jsonObject.containsKey(Constants.SCHEMA_RANGE_INCLUDES)) {
+                    String schemaRangeIncludes = jsonObject.getJsonObject(Constants.SCHEMA_RANGE_INCLUDES)
+                            .getString(Constants.ID);
+                    // safety check for schemaRangeIncludes in case ow wrong owl type assigned
+                    if (schemaRangeIncludes.split(":")[0].equalsIgnoreCase("xsd")){
+                        contextItemType = schemaRangeIncludes;
                     }
+                }
+
+                JsonObjectBuilder item = Json.createObjectBuilder();
+                switch (typeValue) {
+                    case "rdfs:Class":
+                        classes.put(id, jsonObject);
+                        classNamesLowerCased.add(id.toLowerCase());
+                        item.add(Constants.ID, id);
+                        contextItemsMap.put(id, item);
+                        break;
+                    case "rdf:Property":
+                    case "owl:DatatypeProperty":
+                    case "owl:ObjectProperty":
+                        dataTypeProperties.put(jsonObject.getString(Constants.ID), jsonObject);
+                        item.add(Constants.ID, id);
+                        item.add(Constants.TYPE, contextItemType);
+                        contextItemsMap.put(id, item);
+                        break;
+                    default:
+                        if (jsonObject.containsKey(Constants.RDF_VALUE)) {
+                            String codeListId = StringUtils.substringBeforeLast(jsonObject.getString(Constants.ID), "#");
+                            Map<String, JsonObject> codeListValues = null;
+                            if (codeProperties.containsKey(codeListId)) {
+                                codeListValues = codeProperties.get(codeListId);
+                            } else {
+                                codeListValues = new TreeMap<>();
+                            }
+                            codeListValues.put(jsonObject.getString(Constants.ID), jsonObject);
+                            codeProperties.put(codeListId, codeListValues);
+                        }
+                        break;
+
                 }
             }
             fis.close();
@@ -260,7 +222,7 @@ public class DomainsToMD {
                                 mdDataTypeProperty.add("comment", getFirstNWords(comment.asJsonArray().getString(0)));
                             }
                         }
-/*                        JsonValue comment = dataTypeProperty.get(Transformer.RDFS_COMMENT);
+/*                        JsonValue comment = dataTypeProperty.get(Constants.RDFS_COMMENT);
                         if(comment instanceof JsonString)
                             mdDataTypeProperty.add("comment", comment);
                         else if (comment instanceof JsonArray){
@@ -298,7 +260,7 @@ public class DomainsToMD {
                                     mdDataTypeProperty.add("comment", getFirstNWords(comment.asJsonArray().getString(0)));
                                 }
                             }
-                            /*JsonValue comment = dataTypeProperty.get(Transformer.RDFS_COMMENT);
+                            /*JsonValue comment = dataTypeProperty.get(Constants.RDFS_COMMENT);
                             if(comment instanceof JsonString)
                                 mdDataTypeProperty.add("comment", comment);
                             else if (comment instanceof JsonArray){
@@ -357,7 +319,7 @@ public class DomainsToMD {
                             if(comment instanceof JsonString)
                                 mdObjectProperty.add("comment", comment);
                         }
-                        /*JsonValue comment = objectProperty.get(Transformer.RDFS_COMMENT);
+                        /*JsonValue comment = objectProperty.get(Constants.RDFS_COMMENT);
                         if(comment instanceof JsonString)
                             mdObjectProperty.add("comment", comment);
                         else if (comment instanceof JsonArray){
@@ -387,7 +349,7 @@ public class DomainsToMD {
                                 if(comment instanceof JsonString)
                                     mdObjectProperty.add("comment", comment);
                             }
-                        /*JsonValue comment = objectProperty.get(Transformer.RDFS_COMMENT);
+                        /*JsonValue comment = objectProperty.get(Constants.RDFS_COMMENT);
                         if(comment instanceof JsonString)
                             mdObjectProperty.add("comment", comment);
                         else if (comment instanceof JsonArray){
@@ -466,19 +428,6 @@ public class DomainsToMD {
             System.out.print(String.format("\"/%s\",", allocated.replace(":","/")));
         }
         System.out.println();
-        /*List<String> allocatedByClassesKeys = Arrays.asList(new String[]{
-                "appliedAllowanceCharge","appliedChemicalTreatment","appliedTax",
-                "assertion","associatedTransportEquipment","availablePeriod",
-                "binaryFile","calculatedPrice","deliveryInstructions",
-                "deliverySchedule","document","guarantee",
-                "handlingInstructions","haulageInstructions",
-                "inspectionEvent","licence","location",
-                "marking","note","package","quarantineInstructions",
-                "radioactiveMaterial","range","section",
-                "service","specifiedFault","specifiedLocation",
-                "specifiedNote","specifiedParameter","specifiedPeriod",
-                "specifiedRoute","standard","subordinateSubordinateLocation",
-                "transportEvent","transportMeans"});*/
 
         for (JsonObject jsonObject:dataTypeProperties.values()) {
             JsonObjectBuilder batchObject = Json.createObjectBuilder();
@@ -660,7 +609,7 @@ public class DomainsToMD {
                     JsonObjectBuilder mdDomain = Json.createObjectBuilder();
                     String uri = domainsIterator.next().asJsonObject().getString(Constants.ID);
                     if (domainsSet.contains(uri)){
-                        //System.err.println(String.format("Domain %s is repeated for %s", uri, jsonObject.getString(Transformer.ID)));
+                        //System.err.println(String.format("Domain %s is repeated for %s", uri, jsonObject.getString(Constants.ID)));
                         missingDefinitions.add(jsonObject.getString(Constants.ID));
                     } else {
                         domainsSet.add(uri);
@@ -706,8 +655,8 @@ public class DomainsToMD {
             batchObject.add("fields", batchFieldsObject.build());
             batchArrayBuilder.add(batchObject.build());
 
-            /*mdProperty.add("uri", jsonObject.getString(Transformer.ID));
-            mdProperty.add("comment", jsonObject.get(Transformer.RDFS_COMMENT));*/
+            /*mdProperty.add("uri", jsonObject.getString(Constants.ID));
+            mdProperty.add("comment", jsonObject.get(Constants.RDFS_COMMENT));*/
             JsonArrayBuilder mdCodeListValues = Json.createArrayBuilder();
             Map<String, JsonObject> valuesMap = new HashMap<>();
             for (JsonObject jsonObject:codeProperties.get(codeListId).values()) {
@@ -775,6 +724,20 @@ public class DomainsToMD {
         combinedVocabulary.add("@context", context);
         combinedVocabulary.add("@graph", combinedGraphVocabulary.build());
         new FileGenerator().generateFile(combinedVocabulary.build(), true, workingDir.concat("unece").concat(".jsonld"));
+
+        JsonObjectBuilder combinedContextObjectBuilder = Json.createObjectBuilder(context);
+        combinedContextObjectBuilder.add("id", Constants.ID);
+        combinedContextObjectBuilder.add("type", Constants.TYPE);
+
+        List<String> contextItemsKeys = new ArrayList<>();
+        contextItemsKeys.addAll(contextItemsMap.keySet());
+        Collections.sort(contextItemsKeys);
+
+        for (String contextItem: contextItemsKeys){
+            combinedContextObjectBuilder.add(contextItem, contextItemsMap.get(contextItem));
+        }
+        combinedContext.add("@context", combinedContextObjectBuilder.build());
+        new FileGenerator().generateFile(combinedContext.build(), true, workingDir.concat("unece-context").concat(".jsonld"));
 
         if (!missingDefinitions.isEmpty()) {
             for (String uri : missingDefinitions) {
