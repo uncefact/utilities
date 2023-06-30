@@ -21,7 +21,7 @@ public class DomainsToMD {
         Files.createDirectory(Paths.get(workingDir.concat("_properties/")));
 
         try {
-            generate(workingDir, inputFileNames, "jargon");
+            generate(workingDir, inputFileNames, "$DATASET");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
