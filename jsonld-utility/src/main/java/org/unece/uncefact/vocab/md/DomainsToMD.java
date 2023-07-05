@@ -36,6 +36,7 @@ public class DomainsToMD {
         Map<String, String> codeListsDomainsMap = new TreeMap<>();
         Map<String, TreeMap<String, JsonObject>> codeListsReferrencedByMap = new TreeMap<>();
         JsonArrayBuilder batchArrayBuilder = Json.createArrayBuilder();
+        JsonArrayBuilder batchArrayDeleteBuilder = Json.createArrayBuilder();
         Map<String, String> uniqueIDsCheck = new HashMap();
         JsonObjectBuilder combinedVocabulary = Json.createObjectBuilder();
         JsonObjectBuilder combinedContext = Json.createObjectBuilder();
@@ -173,7 +174,12 @@ public class DomainsToMD {
                 batchFieldsObject.add("type", "Class");
                 batchFieldsObject.add("dataset", dataSet);
                 batchObject.add("fields", batchFieldsObject.build());
-                batchArrayBuilder.add(batchObject.build());
+                JsonObject batch = batchObject.build();
+                batchArrayBuilder.add(batch);
+
+                JsonObjectBuilder batchDeleteObject = Json.createObjectBuilder(batch);
+                batchDeleteObject.add("type", "delete");
+                batchArrayDeleteBuilder.add(batchDeleteObject);
             }
 
 
@@ -450,7 +456,13 @@ public class DomainsToMD {
             batchFieldsObject.add("type", "Data Property");
             batchFieldsObject.add("dataset", dataSet);
             batchObject.add("fields", batchFieldsObject.build());
-            batchArrayBuilder.add(batchObject);
+            JsonObject batch = batchObject.build();
+            batchArrayBuilder.add(batch);
+
+            JsonObjectBuilder batchDeleteObject = Json.createObjectBuilder(batch);
+            batchDeleteObject.add("type", "delete");
+            batchArrayDeleteBuilder.add(batchDeleteObject);
+
 
             String permalink = jsonObject.getString(Constants.ID);
             if (allocatedByClassesKeys.contains(permalink)) {
@@ -556,7 +568,13 @@ public class DomainsToMD {
             batchFieldsObject.add("type", "Object Property");
             batchFieldsObject.add("dataset", dataSet);
             batchObject.add("fields", batchFieldsObject.build());
-            batchArrayBuilder.add(batchObject);
+            JsonObject batch = batchObject.build();
+            batchArrayBuilder.add(batch);
+
+            JsonObjectBuilder batchDeleteObject = Json.createObjectBuilder(batch);
+            batchDeleteObject.add("type", "delete");
+            batchArrayDeleteBuilder.add(batchDeleteObject);
+
 
             String prefix = StringUtils.substringBefore(jsonObject.getString(Constants.ID), ":");
             JsonObjectBuilder mdProperty = Json.createObjectBuilder();
@@ -653,7 +671,13 @@ public class DomainsToMD {
             batchFieldsObject.add("type", "Code List");
             batchFieldsObject.add("dataset", dataSet);
             batchObject.add("fields", batchFieldsObject.build());
-            batchArrayBuilder.add(batchObject.build());
+            JsonObject batch = batchObject.build();
+            batchArrayBuilder.add(batch);
+
+            JsonObjectBuilder batchDeleteObject = Json.createObjectBuilder(batch);
+            batchDeleteObject.add("type", "delete");
+            batchArrayDeleteBuilder.add(batchDeleteObject);
+
 
             /*mdProperty.add("uri", jsonObject.getString(Constants.ID));
             mdProperty.add("comment", jsonObject.get(Constants.RDFS_COMMENT));*/
@@ -675,7 +699,13 @@ public class DomainsToMD {
                 batchFieldsObject.add("type", "Code List Value");
                 batchFieldsObject.add("dataset", dataSet);
                 batchObject.add("fields", batchFieldsObject.build());
-                batchArrayBuilder.add(batchObject.build());
+                batch = batchObject.build();
+                batchArrayBuilder.add(batch);
+
+                batchDeleteObject = Json.createObjectBuilder(batch);
+                batchDeleteObject.add("type", "delete");
+                batchArrayDeleteBuilder.add(batchDeleteObject);
+
 
             }
             List<String> valuesList = new ArrayList<>();
@@ -720,6 +750,11 @@ public class DomainsToMD {
         JsonObjectBuilder rootObject = Json.createObjectBuilder();
         rootObject.add("batch", batchArrayBuilder.build());
         new FileGenerator().generateFile(rootObject.build(), false, workingDir.concat("batch-add").concat(".json"));
+
+        rootObject = Json.createObjectBuilder();
+        rootObject.add("batch", batchArrayDeleteBuilder.build());
+        new FileGenerator().generateFile(rootObject.build(), false, workingDir.concat("batch-delete").concat(".json"));
+
 
         combinedVocabulary.add("@context", context);
         combinedVocabulary.add("@graph", combinedGraphVocabulary.build());
