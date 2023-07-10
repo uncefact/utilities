@@ -430,8 +430,19 @@ public class DomainsToMD {
                 allocatedByClassesKeys.add(objectTypeProperty);
             }
         }
+        if (!allocatedByClassesKeys.isEmpty()){
+            System.out.println("Properties with the names already allocated by classes:");
+        }
         for (String allocated: allocatedByClassesKeys) {
-            System.out.print(String.format("\"/%s\",", allocated.replace(":","/")));
+            System.out.println(allocated);
+            String mdContent = "---\n";
+            String id = StringUtils.substringAfter(allocated, ":");
+            mdContent = mdContent.concat(String.format("title: %s", id)).concat("\n");
+            mdContent = mdContent.concat(String.format("permalink: %s%s", "", id)).concat("\n");
+            mdContent = mdContent.concat("redirect_to:\n");
+            mdContent = mdContent.concat(String.format("  - %s", id.concat("Property"))).concat("\n");
+            mdContent = mdContent.concat("---\n");
+            new FileGenerator().generateTextFile(mdContent,workingDir.concat("_properties/").concat(id.toLowerCase()).concat(".md"));
         }
         System.out.println();
 
