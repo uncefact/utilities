@@ -41,17 +41,33 @@ public class FileGenerator {
 
     public void verify (JsonArray array){
         Set<String> ids = new HashSet<>();
-        Set<String> idsLC = new HashSet<>();
+        Map<String, String> idsLC = new HashMap<>();
+        Set<String> duplicates = new HashSet<>();
+        Map<String,String> duplicatesCaseIgnored = new HashMap<>();
         for (JsonObject jsonObject:array.getValuesAs(JsonObject.class)) {
             String id = jsonObject.getString(Constants.ID);
             if (ids.contains(id)) {
-                System.err.println(String.format("%s already exists in the vocabulary", id));
+                duplicates.add(id);
             } else {
                 ids.add(id);
-            } if (idsLC.contains(id.toLowerCase())) {
-                System.out.println(String.format("%s exists in the vocabulary as another resource (case sensitive)", id));
+            } if (idsLC.containsKey(id.toLowerCase())) {
+                duplicatesCaseIgnored.put(idsLC.get(id.toLowerCase()), id);
             } else {
-                idsLC.add(id.toLowerCase());
+                idsLC.put(id.toLowerCase(), id);
+            }
+        }
+
+        if (!duplicates.isEmpty()) {
+            System.err.println("### :x: Resources with the same names exist in the vocabulary:");
+            for (String id:duplicates){
+                System.err.println(String.format("- %s", id));
+            }
+        }
+
+        if (!duplicatesCaseIgnored.isEmpty()){
+            System.out.println("### :warning: Resources with the same names (case ignored) exist in the vocabulary:");
+            for (String id:duplicatesCaseIgnored.keySet()){
+                System.out.println(String.format("- %s and %s", id, duplicatesCaseIgnored.get(id)));
             }
         }
 
@@ -61,10 +77,16 @@ public class FileGenerator {
                 String rangeIncludes = jsonObject.getJsonObject(Constants.SCHEMA_RANGE_INCLUDES).getString(Constants.ID);
                 if (!ids.contains(rangeIncludes)) {
                     if (!missingRanges.contains(rangeIncludes)) {
-                        System.err.println(String.format("%s missing from the vocabulary", rangeIncludes));
                         missingRanges.add(rangeIncludes);
                     }
                 }
+            }
+        }
+
+        if (!missingRanges.isEmpty()){
+            System.err.println("### :x: Schema range includes are used but not defined in the vocabulary:");
+            for (String id:missingRanges){
+                System.err.println(String.format("- %s", id));
             }
         }
     }

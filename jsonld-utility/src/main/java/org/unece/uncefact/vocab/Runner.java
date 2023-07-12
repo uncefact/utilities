@@ -6,6 +6,7 @@ import org.unece.uncefact.vocab.md.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -15,6 +16,8 @@ public class Runner {
     final static Options options = new Options();
 
     public static void main(String[] args) throws ParseException, IOException {
+        System.setErr(new PrintStream("err.md"));
+        System.setOut(new PrintStream("out.md"));
         Attributes mainAttributes = readProperties();
         String version = mainAttributes.getValue("Implementation-Version");
 
