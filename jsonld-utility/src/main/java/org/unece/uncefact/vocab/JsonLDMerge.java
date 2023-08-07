@@ -32,6 +32,7 @@ public class JsonLDMerge {
             boolean valid = true;
             Map<String, JsonObject> items = new HashMap<>();
             JsonObjectBuilder context = Json.createObjectBuilder();
+            Set<String> duplicatesInDifferentDomains = new HashSet<>();
             for (String domain : domains) {
                 String domainName = StringUtils.substringBetween(domain, workingDir, ".jsonld");
                 InputStream fis = null;
@@ -59,13 +60,19 @@ public class JsonLDMerge {
                     JsonObjectBuilder objectBuilder = Json.createObjectBuilder(item);
                     String id = item.getString("@id");
                     if (items.containsKey(id)) {
-                        System.err.println(String.format("Vocabulary already contains %s resource", id));
+                        duplicatesInDifferentDomains.add(String.format("%s (%s)", id, items.get(id).getString("unece:businessDomain")));
                     } else {
                         objectBuilder.add(Constants.UNECE_BUSINESS_DOMAIN, domainName);
                         items.put(id, objectBuilder.build());
                     }
                 }
                 reader.close();
+            }
+            if (!duplicatesInDifferentDomains.isEmpty()){
+                System.err.println("### :x: Vocabulary contains resources, that already are defined in other domains:");
+                for (String duplicate:duplicatesInDifferentDomains) {
+                    System.err.println(String.format("- %s", duplicate));
+                }
             }
             JsonArrayBuilder mergedGraph = Json.createArrayBuilder();
             List<String> keys = new ArrayList<>(items.keySet());
