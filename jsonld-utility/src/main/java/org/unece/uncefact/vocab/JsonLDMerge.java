@@ -60,7 +60,7 @@ public class JsonLDMerge {
                     JsonObjectBuilder objectBuilder = Json.createObjectBuilder(item);
                     String id = item.getString("@id");
                     if (items.containsKey(id)) {
-                        duplicatesInDifferentDomains.add(String.format("%s (%s)", id, items.get(id).getString("unece:businessDomain")));
+                        duplicatesInDifferentDomains.add(String.format("%s (%s and %s)", id, domainName, items.get(id).getString("unece:businessDomain")));
                     } else {
                         objectBuilder.add(Constants.UNECE_BUSINESS_DOMAIN, domainName);
                         items.put(id, objectBuilder.build());
@@ -69,7 +69,7 @@ public class JsonLDMerge {
                 reader.close();
             }
             if (!duplicatesInDifferentDomains.isEmpty()){
-                System.err.println("### :x: Vocabulary contains resources, that already are defined in other domains:");
+                System.err.println("### :x: The same resource is defined in different domains:");
                 for (String duplicate:duplicatesInDifferentDomains) {
                     System.err.println(String.format("- %s", duplicate));
                 }
