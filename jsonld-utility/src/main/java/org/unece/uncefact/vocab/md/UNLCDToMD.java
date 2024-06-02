@@ -78,7 +78,7 @@ public class UNLCDToMD {
                 mdContent += String.format("permalink: %s%s\n", "unlocode", countryCode);
                 mdContent += String.format("jsonid: %s%s\n", "unlocode", countryCode);
                 mdContent += String.format("label: %s\n", "UN/LOCODE");
-                mdContent += String.format("comment: %s\n", "desc");
+//                mdContent += String.format("comment: %s\n", "desc");
                 mdContent += "excludeFromList: true\n";
                 mdContent += "columns:\n";
                 mdContent += "  - \n";
@@ -106,7 +106,7 @@ public class UNLCDToMD {
                 mdContent += "    title: Longitude\n";
                 mdContent += String.format("    code: %s\n", UNLOCODEConstants.GEO_NS+":long");
                 mdContent += "---\n";
-                new FileGenerator().generateTextFile(mdContent, String.format(workingDir+"/_code-lists/unlocode%s.md", countryCode));
+                new FileGenerator().generateTextFile(mdContent, String.format(workingDir+"/_unlocode-lists/unlocode%s.md", countryCode));
             }
             countryCode = currentCountryCode;
             csvContent += String.format("\"%s\",", jsonObject.getString(Constants.ID));
@@ -174,7 +174,7 @@ public class UNLCDToMD {
         mdContent += String.format("permalink: %s%s\n", "unlocode", countryCode);
         mdContent += String.format("jsonid: %s%s\n", "unlocode", countryCode);
         mdContent += String.format("label: %s\n", "UN/LOCODE");
-        mdContent += String.format("comment: %s\n", "desc");
+//        mdContent += String.format("comment: %s\n", "desc");
         mdContent += "excludeFromList: true\n";
         mdContent += "columns:\n";
         mdContent += "  - \n";
@@ -202,7 +202,7 @@ public class UNLCDToMD {
         mdContent += "    title: Longitude\n";
         mdContent += String.format("    code: %s\n", UNLOCODEConstants.GEO_NS+":long");
         mdContent += "---\n";
-        new FileGenerator().generateTextFile(mdContent, String.format(workingDir+"/_code-lists/unlocode%s.md", countryCode));
+        new FileGenerator().generateTextFile(mdContent, String.format(workingDir+"/_unlocode-lists/unlocode%s.md", countryCode));
         fis.close();
     }
 }

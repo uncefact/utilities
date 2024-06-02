@@ -697,7 +697,11 @@ public class DomainsToMD {
             for (JsonObject jsonObject:codeProperties.get(codeListId).values()) {
                 JsonObjectBuilder mdCodeListValue = Json.createObjectBuilder();
                 mdCodeListValue.add("uri",jsonObject.getString(Constants.ID));
-                mdCodeListValue.add("comment",jsonObject.getString(Constants.RDFS_COMMENT));
+                if(jsonObject.containsKey(Constants.RDFS_COMMENT)){
+                    mdCodeListValue.add("comment",jsonObject.getString(Constants.RDFS_COMMENT));
+                } else{
+                    mdCodeListValue.add("comment","");
+                }
                 mdCodeListValue.add("value",jsonObject.getString(Constants.RDF_VALUE));
                 valuesMap.put(jsonObject.getString(Constants.RDF_VALUE), mdCodeListValue.build());
 
@@ -706,7 +710,11 @@ public class DomainsToMD {
                 batchObject.add("id", dataSet.concat("_").concat(jsonObject.getString(Constants.ID)));
                 batchFieldsObject = Json.createObjectBuilder();
                 batchFieldsObject.add("label", StringUtils.substringAfter(jsonObject.getString(Constants.ID), ":"));
-                batchFieldsObject.add("comment", jsonObject.getString(Constants.RDFS_COMMENT));
+                if(jsonObject.containsKey(Constants.RDFS_COMMENT)){
+                    batchFieldsObject.add("comment", jsonObject.getString(Constants.RDFS_COMMENT));
+                } else{
+                    batchFieldsObject.add("comment", "");
+                }
                 batchFieldsObject.add("type", "Code List Value");
                 batchFieldsObject.add("dataset", dataSet);
                 batchObject.add("fields", batchFieldsObject.build());

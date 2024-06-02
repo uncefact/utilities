@@ -55,7 +55,7 @@ public class UNLCDSubdivisionsToMD {
         mdContent = mdContent.concat(String.format("permalink: %s", "unlocode-subdivisions")).concat("\n");
         mdContent = mdContent.concat(String.format("jsonid: %s", "unlocode-subdivisions")).concat("\n");
         mdContent = mdContent.concat(String.format("label: %s", "UN/LOCODE Country Subdivisions")).concat("\n");
-        mdContent = mdContent.concat(String.format("comment: %s", "desc")).concat("\n");
+//        mdContent = mdContent.concat(String.format("comment: %s", "desc")).concat("\n");
         mdContent = mdContent.concat("columns:\n");
         mdContent = mdContent.concat("  - \n");
         mdContent = mdContent.concat("    title: Label\n");
@@ -71,7 +71,7 @@ public class UNLCDSubdivisionsToMD {
         mdContent = mdContent.concat("    title: Value\n");
         mdContent = mdContent.concat(String.format("    code: %s\n", "value"));
         mdContent = mdContent.concat("---\n");
-        new FileGenerator().generateTextFile(mdContent,workingDir+"/_code-lists/unlocode-subdivisions.md");
+        new FileGenerator().generateTextFile(mdContent,workingDir+"/_unlocode-lists/unlocode-subdivisions.md");
         fis.close();
     }
 }

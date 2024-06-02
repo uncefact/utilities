@@ -27,7 +27,7 @@ public class Runner {
         Option prettyPrintOption = new Option("p", "pretty-print",false, "an output file to be created as a result of transformation. Default value: output.jsonld.");
         Option workindDirOption = new Option("d", "directory",true, "Working directory for files to be merged or for md generation. Default value for merge - \"vocab/\", for md - \"\"");
         Option inputFilesOption = new Option("i", "input-file",true, "Input file name to be merged or for md generation. Default value for md generation - \"merged.jsonld/\"");
-        Option outputFileNameOption = new Option("o", "input-file",true, "Input file name to be merged or for md generation. Default value for md generation - \"merged.jsonld/\"");
+        Option outputFileNameOption = new Option("o", "output-file",true, "Input file name to be merged or for md generation. Default value for md generation - \"merged.jsonld/\"");
         Option versionOption = new Option("?", "version", false, "display this help.");
 
         options.addOption(runningModeOption);
@@ -73,6 +73,8 @@ public class Runner {
                 case "merge":
                     workingDir = "vocab/";
                     break;
+                case "md-locode":
+                    workingDir = ".";
                 case "md":
                 case "minify":
                 case "pretty-print":
@@ -113,6 +115,12 @@ public class Runner {
                 DomainsToMD.generate(workingDir, inputFileNames);
                 break;
 
+            case "md-locode":
+                UNLCDToMD.generate(workingDir);
+                UNLCDCountriesToMD.generate(workingDir);
+                UNLCDFunctionsToMD.generate(workingDir);
+                UNLCDSubdivisionsToMD.generate(workingDir);
+                break;
             case "minify":
                 JsonLDMerge.format(workingDir, inputFileNames, false, outputFileName);
                 break;

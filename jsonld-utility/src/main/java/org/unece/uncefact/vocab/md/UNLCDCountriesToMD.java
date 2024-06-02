@@ -50,7 +50,7 @@ public class UNLCDCountriesToMD {
         mdContent = mdContent.concat(String.format("permalink: %s", "unlocode-countries")).concat("\n");
         mdContent = mdContent.concat(String.format("jsonid: %s", "unlocode-countries")).concat("\n");
         mdContent = mdContent.concat(String.format("label: %s", "UN/LOCODE Countries")).concat("\n");
-        mdContent = mdContent.concat(String.format("comment: %s", "desc")).concat("\n");
+//        mdContent = mdContent.concat(String.format("comment: %s", "desc")).concat("\n");
         mdContent = mdContent.concat("columns:\n");
         mdContent = mdContent.concat("  - \n");
         mdContent = mdContent.concat("    title: Label\n");
@@ -62,7 +62,7 @@ public class UNLCDCountriesToMD {
         mdContent = mdContent.concat("    title: UN/LOCODEs\n");
         mdContent = mdContent.concat(String.format("    type: %s\n", "unlocode-link"));
         mdContent = mdContent.concat("---\n");
-        new FileGenerator().generateTextFile(mdContent,workingDir+"/_code-lists/unlocode-countries.md");
+        new FileGenerator().generateTextFile(mdContent,workingDir+"/_unlocode-lists/unlocode-countries.md");
         fis.close();
     }
 }

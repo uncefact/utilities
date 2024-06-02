@@ -42,7 +42,7 @@ public class UNLCDFunctionsToMD {
             JsonObject jsonObject = iterator.next().asJsonObject();
             csvContent = csvContent.concat(String.format("\"%s\",", jsonObject.getString(Constants.ID)));
             csvContent = csvContent.concat(String.format("\"%s\",", jsonObject.getString(Constants.RDFS_LABEL)));
-            csvContent = csvContent.concat(String.format("\"%s\",", jsonObject.getString(Constants.RDFS_COMMENT)));
+            csvContent = csvContent.concat(String.format("\"%s\",", jsonObject.getString(Constants.RDFS_COMMENT).replaceAll("\"", "'")));
             csvContent = csvContent.concat(String.format("\"%s\"\n", jsonObject.getString(Constants.RDF_VALUE)));
         }
         new FileGenerator().generateTextFile(csvContent,workingDir+"/_data/unlocode-functions.csv");
@@ -52,7 +52,7 @@ public class UNLCDFunctionsToMD {
         mdContent = mdContent.concat(String.format("permalink: %s", "unlocode-functions")).concat("\n");
         mdContent = mdContent.concat(String.format("jsonid: %s", "unlocode-functions")).concat("\n");
         mdContent = mdContent.concat(String.format("label: %s", "UN/LOCODE Functions")).concat("\n");
-        mdContent = mdContent.concat(String.format("comment: %s", "desc")).concat("\n");
+//        mdContent = mdContent.concat(String.format("comment: %s", "desc")).concat("\n");
         mdContent = mdContent.concat("columns:\n");
         mdContent = mdContent.concat("  - \n");
         mdContent = mdContent.concat("    title: Label\n");
@@ -64,7 +64,7 @@ public class UNLCDFunctionsToMD {
         mdContent = mdContent.concat("    title: Value\n");
         mdContent = mdContent.concat(String.format("    code: %s\n", "value"));
         mdContent = mdContent.concat("---\n");
-        new FileGenerator().generateTextFile(mdContent,workingDir+"/_code-lists/unlocode-functions.md");
+        new FileGenerator().generateTextFile(mdContent,workingDir+"/_unlocode-lists/unlocode-functions.md");
         fis.close();
     }
 }
