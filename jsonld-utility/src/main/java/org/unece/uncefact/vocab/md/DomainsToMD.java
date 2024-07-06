@@ -226,6 +226,8 @@ public class DomainsToMD {
                                 mdDataTypeProperty.add("comment", comment);
                             } else if (comment instanceof JsonArray){
                                 mdDataTypeProperty.add("comment", getFirstNWords(comment.asJsonArray().getString(0)));
+                            } else {
+                                mdDataTypeProperty.add("comment", "Missing comment");
                             }
                         }
 /*                        JsonValue comment = dataTypeProperty.get(Constants.RDFS_COMMENT);
@@ -264,6 +266,8 @@ public class DomainsToMD {
                                 }
                                 else if (comment instanceof JsonArray){
                                     mdDataTypeProperty.add("comment", getFirstNWords(comment.asJsonArray().getString(0)));
+                                } else {
+                                    mdDataTypeProperty.add("comment", "Missing comment");
                                 }
                             }
                             /*JsonValue comment = dataTypeProperty.get(Constants.RDFS_COMMENT);
@@ -289,6 +293,9 @@ public class DomainsToMD {
                         }
                         else if (comment instanceof JsonArray){
                             mdReferencedBy.add("comment", getFirstNWords(comment.asJsonArray().getString(0)));
+                        }
+                        else {
+                            mdReferencedBy.add("comment", "Missing comment");
                         }
                         referencedBySet.put(dataTypeProperty.getString(Constants.ID), mdReferencedBy.build());
                     }
@@ -433,6 +440,9 @@ public class DomainsToMD {
         if (!allocatedByClassesKeys.isEmpty()){
             System.out.println("Properties with the names already allocated by classes:");
         }
+        /**
+         * DO NOT generate md files with redirect_to
+         * TODO: check if redirect_to is working
         for (String allocated: allocatedByClassesKeys) {
             System.out.println(allocated);
             String mdContent = "---\n";
@@ -444,6 +454,7 @@ public class DomainsToMD {
             mdContent = mdContent.concat("---\n");
             new FileGenerator().generateTextFile(mdContent,workingDir.concat("_properties/").concat(id.toLowerCase()).concat(".md"));
         }
+         */
         System.out.println();
 
         for (JsonObject jsonObject:dataTypeProperties.values()) {
@@ -499,6 +510,17 @@ public class DomainsToMD {
                     rdfPropertiesWithCodevalues.add(jsonObject.getString(Constants.ID));
                 }
                 mdDomain.add("uri", uri);
+                if (classesCommentsMap.containsKey(uri)) {
+                    mdDomain.add("comment", classesCommentsMap.get(uri));
+                } else {
+                    if (classes.containsKey(uri)) {
+                        System.err.println(String.format("Missing comment for %s", uri));
+                        mdDomain.add("comment", "missing comment");
+                    }else {
+                        /*System.err.println(String.format("Missing class definition for %s", uri));*/
+                        missingDefinitions.add(uri);
+                    }
+                }
                 mdRangeIncludes.add(mdDomain.build());
             }
             mdProperty.add("rangeIncludes", mdRangeIncludes.build());
@@ -550,6 +572,8 @@ public class DomainsToMD {
             mdContent = mdContent.concat("---\n");
             new FileGenerator().generateTextFile(mdContent,workingDir.concat("_properties/").concat(outputFileName).concat(".md"));
         }
+        
+        System.out.println("unece:SpecifiedPeriod - " + classesCommentsMap.get("unece:SpecifiedPeriod"));
         for (JsonObject jsonObject:objectsProperties.values()) {
             JsonObjectBuilder batchObject = Json.createObjectBuilder();
             batchObject.add("type", "add");
@@ -605,8 +629,11 @@ public class DomainsToMD {
                 JsonObjectBuilder mdDomain = Json.createObjectBuilder();
                 String uri = rangeIncludes.asJsonObject().getString(Constants.ID);
                 mdDomain.add("uri", uri);
-                if (classesCommentsMap.containsKey(uri))
+                if (classesCommentsMap.containsKey(uri)) {
                     mdDomain.add("comment", classesCommentsMap.get(uri));
+                } else {
+                    mdDomain.add("comment", "missing comment");
+                }
                 mdRangeIncludes.add(mdDomain.build());
             } else if (rangeIncludes instanceof JsonArray) {
                 Iterator<JsonValue> domainsIterator = ((JsonArray) rangeIncludes).iterator();
@@ -614,7 +641,11 @@ public class DomainsToMD {
                     JsonObjectBuilder mdDomain = Json.createObjectBuilder();
                     String uri = domainsIterator.next().asJsonObject().getString(Constants.ID);
                     mdDomain.add("uri", uri);
-                    mdDomain.add("comment", classesCommentsMap.get(uri));
+                    if (classesCommentsMap.containsKey(uri)) {
+                        mdDomain.add("comment", classesCommentsMap.get(uri));
+                    } else {
+                        mdDomain.add("comment", "missing comment");
+                    }
                     mdRangeIncludes.add(mdDomain.build());
                 }
             }
