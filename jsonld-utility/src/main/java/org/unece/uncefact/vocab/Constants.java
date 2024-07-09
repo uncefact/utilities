@@ -21,6 +21,9 @@ public abstract class Constants {
     public static String SCHEMA_NS = "schema";
     public static String SCHEMA_DOMAIN_INCLUDES = SCHEMA_NS+":domainIncludes";
     public static String SCHEMA_RANGE_INCLUDES = SCHEMA_NS+":rangeIncludes";
+    public static String OWL_EQUIVALENT_PROPERTY = OWL_NS+ ":equivalentProperty";
+    public static String RDFS_SUBCLASS_OF = RDFS_NS+ ":subClassOf";
+
     public static String UNECE_BUSINESS_DOMAIN = UNECE_NS+":businessDomain";
 
     public static final String UNLOCODE_NS = "unlcd";

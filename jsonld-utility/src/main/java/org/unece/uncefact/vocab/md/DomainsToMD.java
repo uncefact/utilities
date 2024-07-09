@@ -191,6 +191,15 @@ public class DomainsToMD {
             if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
                 mdClass.add("businessDomain", jsonObject.get(Constants.UNECE_BUSINESS_DOMAIN));
 
+            if(jsonObject.containsKey(Constants.OWL_EQUIVALENT_PROPERTY)){
+                mdClass.add("equivalentProperty", jsonObject.get(Constants.OWL_EQUIVALENT_PROPERTY).asJsonObject().getString(Constants.ID));
+            }
+            
+            if(jsonObject.containsKey(Constants.RDFS_SUBCLASS_OF)){
+                mdClass.add("subClassOf", jsonObject.get(Constants.RDFS_SUBCLASS_OF));
+            }
+            
+
             JsonValue classComment = jsonObject.get(Constants.RDFS_COMMENT);
             if(classComment instanceof JsonString){
                 classesCommentsMap.put(jsonObject.getString(Constants.ID), jsonObject.getString(Constants.RDFS_COMMENT));
@@ -501,6 +510,15 @@ public class DomainsToMD {
             if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
                 mdProperty.add("businessDomain", jsonObject.get(Constants.UNECE_BUSINESS_DOMAIN));
 
+            if(jsonObject.containsKey(Constants.OWL_EQUIVALENT_PROPERTY)){
+                mdProperty.add("equivalentProperty", jsonObject.get(Constants.OWL_EQUIVALENT_PROPERTY).asJsonObject().getString(Constants.ID));
+            }
+
+            
+            if(jsonObject.containsKey(Constants.RDFS_SUBCLASS_OF)){
+                mdProperty.add("subClassOf", jsonObject.get(Constants.RDFS_SUBCLASS_OF));
+            }
+            
             JsonValue rangeIncludes = jsonObject.get(Constants.SCHEMA_RANGE_INCLUDES);
             JsonArrayBuilder mdRangeIncludes = Json.createArrayBuilder();
             if(rangeIncludes instanceof JsonObject) {
@@ -623,6 +641,15 @@ public class DomainsToMD {
             if (jsonObject.containsKey(Constants.UNECE_BUSINESS_DOMAIN))
                 mdProperty.add("businessDomain", jsonObject.get(Constants.UNECE_BUSINESS_DOMAIN));
 
+            if(jsonObject.containsKey(Constants.OWL_EQUIVALENT_PROPERTY)){
+                mdProperty.add("equivalentProperty", jsonObject.get(Constants.OWL_EQUIVALENT_PROPERTY).asJsonObject().getString(Constants.ID));
+            }
+
+            
+            if(jsonObject.containsKey(Constants.RDFS_SUBCLASS_OF)){
+                mdProperty.add("subClassOf", jsonObject.get(Constants.RDFS_SUBCLASS_OF));
+            }
+            
             JsonArrayBuilder mdRangeIncludes = Json.createArrayBuilder();
             JsonValue rangeIncludes = jsonObject.get(Constants.SCHEMA_RANGE_INCLUDES);
             if(rangeIncludes instanceof JsonObject) {
