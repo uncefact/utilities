@@ -836,25 +836,28 @@ public class DomainsToMD {
         rootObject.add("batch", batchArrayDeleteBuilder.build());
         new FileGenerator().generateFile(rootObject.build(), false, workingDir.concat("batch-delete").concat(".json"));
 
-
-        combinedVocabulary.add("@context", context);
-        combinedVocabulary.add("@graph", combinedGraphVocabulary.build());
-        new FileGenerator().generateFile(combinedVocabulary.build(), true, workingDir.concat("unece").concat(".jsonld"));
-
-        JsonObjectBuilder combinedContextObjectBuilder = Json.createObjectBuilder(context);
-        combinedContextObjectBuilder.add("id", Constants.ID);
-        combinedContextObjectBuilder.add("type", Constants.TYPE);
-
-        List<String> contextItemsKeys = new ArrayList<>();
-        contextItemsKeys.addAll(contextItemsMap.keySet());
-        Collections.sort(contextItemsKeys);
-
-        for (String contextItem: contextItemsKeys){
-            combinedContextObjectBuilder.add(contextItem, contextItemsMap.get(contextItem));
+        if (inputFileNames.size()>1) {
+            combinedVocabulary.add("@context", context);
+            combinedVocabulary.add("@graph", combinedGraphVocabulary.build());
+            new FileGenerator().generateFile(combinedVocabulary.build(), true, workingDir.concat("combined").concat(".jsonld"));
+    
+            JsonObjectBuilder combinedContextObjectBuilder = Json.createObjectBuilder(context);
+            combinedContextObjectBuilder.add("id", Constants.ID);
+            combinedContextObjectBuilder.add("type", Constants.TYPE);
+    
+            List<String> contextItemsKeys = new ArrayList<>();
+            contextItemsKeys.addAll(contextItemsMap.keySet());
+            Collections.sort(contextItemsKeys);
+    
+            for (String contextItem: contextItemsKeys){
+                combinedContextObjectBuilder.add(contextItem, contextItemsMap.get(contextItem));
+            }
+            combinedContext.add("@context", combinedContextObjectBuilder.build());
+            new FileGenerator().generateFile(combinedContext.build(), true, workingDir.concat("combined-context").concat(".jsonld"));
+        
         }
-        combinedContext.add("@context", combinedContextObjectBuilder.build());
-        new FileGenerator().generateFile(combinedContext.build(), true, workingDir.concat("unece-context").concat(".jsonld"));
 
+        
         if (!missingDefinitions.isEmpty()) {
             for (String uri : missingDefinitions) {
                 System.err.println(uri);
