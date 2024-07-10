@@ -727,7 +727,9 @@ public class DomainsToMD {
             String label = StringUtils.substringAfter(codeListId, ":");
             mdCodelist.add("label", label);
             mdCodelist.add("uri", codeListId);
-            mdCodelist.add("comment", codeListsCommentsMap.get(codeListId));
+            if(codeListsCommentsMap.containsKey(codeListId)) {
+                mdCodelist.add("comment", codeListsCommentsMap.get(codeListId));
+            }
             if (codeListsDomainsMap.containsKey(codeListId))
                 mdCodelist.add("businessDomain", codeListsDomainsMap.containsKey(codeListId));
 
@@ -736,7 +738,9 @@ public class DomainsToMD {
             batchObject.add("id", dataSet.concat("_").concat(codeListId));
             JsonObjectBuilder batchFieldsObject = Json.createObjectBuilder();
             batchFieldsObject.add("label", label);
-            batchFieldsObject.add("comment", codeListsCommentsMap.get(codeListId));
+            if(classesCommentsMap.containsKey(codeListId)){
+                batchFieldsObject.add("comment", codeListsCommentsMap.get(codeListId));
+            }
             batchFieldsObject.add("type", "Code List");
             batchFieldsObject.add("dataset", dataSet);
             batchObject.add("fields", batchFieldsObject.build());
