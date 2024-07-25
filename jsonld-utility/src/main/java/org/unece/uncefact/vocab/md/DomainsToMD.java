@@ -5,6 +5,8 @@ import org.unece.uncefact.vocab.Constants;
 import org.unece.uncefact.vocab.FileGenerator;
 
 import jakarta.json.*;
+import jakarta.json.JsonValue.ValueType;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -760,7 +762,11 @@ public class DomainsToMD {
                 JsonObjectBuilder mdCodeListValue = Json.createObjectBuilder();
                 mdCodeListValue.add("uri",jsonObject.getString(Constants.ID));
                 if(jsonObject.containsKey(Constants.RDFS_COMMENT)){
-                    mdCodeListValue.add("comment",jsonObject.getString(Constants.RDFS_COMMENT));
+                    if (jsonObject.getValueType() == ValueType.ARRAY) {
+                        mdCodeListValue.add("comment",jsonObject.getJsonArray(Constants.RDFS_COMMENT));                                                
+                    } else if (jsonObject.getValueType() == ValueType.STRING) {
+                        mdCodeListValue.add("comment",jsonObject.getString(Constants.RDFS_COMMENT));                        
+                    } 
                 } else{
                     mdCodeListValue.add("comment","");
                 }
@@ -773,7 +779,11 @@ public class DomainsToMD {
                 batchFieldsObject = Json.createObjectBuilder();
                 batchFieldsObject.add("label", StringUtils.substringAfter(jsonObject.getString(Constants.ID), ":"));
                 if(jsonObject.containsKey(Constants.RDFS_COMMENT)){
-                    batchFieldsObject.add("comment", jsonObject.getString(Constants.RDFS_COMMENT));
+                    if (jsonObject.getValueType() == ValueType.ARRAY) {
+                        batchFieldsObject.add("comment",jsonObject.getJsonArray(Constants.RDFS_COMMENT));                                                
+                    } else if (jsonObject.getValueType() == ValueType.STRING) {
+                        batchFieldsObject.add("comment",jsonObject.getString(Constants.RDFS_COMMENT));                        
+                    } 
                 } else{
                     batchFieldsObject.add("comment", "");
                 }
