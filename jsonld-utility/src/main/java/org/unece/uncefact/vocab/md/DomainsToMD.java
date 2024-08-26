@@ -66,6 +66,16 @@ public class DomainsToMD {
             if (context == null) {
                 context = vocabulary.getJsonObject("@context");
             }
+
+            JsonObjectBuilder mappingJsonObject = Json.createObjectBuilder();
+
+            for (String key:context.keySet()){
+                JsonString value = context.getJsonString(key);
+                mappingJsonObject.add(key, value);
+            }
+            new FileGenerator().generateFile(mappingJsonObject.build(), true, workingDir.concat("_data/").concat("mapping.json"));
+
+
             JsonArray graph = vocabulary.getJsonArray("@graph");
 
             Iterator<JsonValue> iterator = graph.iterator();
