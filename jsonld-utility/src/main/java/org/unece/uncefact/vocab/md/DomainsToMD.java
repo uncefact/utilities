@@ -733,6 +733,8 @@ public class DomainsToMD {
             new FileGenerator().generateTextFile(mdContent,workingDir.concat("_properties/").concat(outputFileName).concat(".md"));
         }
         for (String codeListId:codeProperties.keySet()) {
+            boolean hasLabel = false;
+            boolean hasComment = false;
             String outputFileName = StringUtils.substringAfter(codeListId, ":").replaceAll("\\.","_").toLowerCase();
 
             JsonObjectBuilder mdCodelist = Json.createObjectBuilder();
@@ -772,6 +774,7 @@ public class DomainsToMD {
                 JsonObjectBuilder mdCodeListValue = Json.createObjectBuilder();
                 mdCodeListValue.add("uri",jsonObject.getString(Constants.ID));
                 if(jsonObject.containsKey(Constants.RDFS_COMMENT)){
+                    hasComment = true;
                     JsonValue comment = jsonObject.get(Constants.RDFS_COMMENT);
                     if (comment.getValueType() == ValueType.ARRAY) {
                         mdCodeListValue.add("comment",jsonObject.getJsonArray(Constants.RDFS_COMMENT));                                                
@@ -782,6 +785,7 @@ public class DomainsToMD {
                     mdCodeListValue.add("comment","");
                 }
                 if(jsonObject.containsKey(Constants.RDFS_LABEL)){
+                    hasLabel = true;
                     mdCodeListValue.add("label",jsonObject.getString(Constants.RDFS_LABEL));
                 }
                 mdCodeListValue.add("value",jsonObject.getString(Constants.RDF_VALUE));
@@ -842,9 +846,16 @@ public class DomainsToMD {
             mdContent = mdContent.concat(String.format("permalink: %s", StringUtils.substringAfter(codeListId,":"))).concat(".html\n");
             mdContent = mdContent.concat(String.format("jsonid: %s", outputFileName.toLowerCase())).concat("\n");
             mdContent += "columns:\n";
-            mdContent += "  - \n";
-            mdContent += "    title: Comment\n";
-            mdContent += String.format("    code: %s\n", "comment");
+            if (hasLabel) {
+                mdContent += "  - \n";
+                mdContent += "    title: Label\n";
+                mdContent += String.format("    code: %s\n", "label");
+            }
+            if (hasComment) {
+                mdContent += "  - \n";
+                mdContent += "    title: Comment\n";
+                mdContent += String.format("    code: %s\n", "comment");
+            }
             mdContent += "  - \n";
             mdContent += "    title: Value\n";
             mdContent += String.format("    code: %s\n", "value");
