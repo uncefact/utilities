@@ -772,13 +772,17 @@ public class DomainsToMD {
                 JsonObjectBuilder mdCodeListValue = Json.createObjectBuilder();
                 mdCodeListValue.add("uri",jsonObject.getString(Constants.ID));
                 if(jsonObject.containsKey(Constants.RDFS_COMMENT)){
-                    if (jsonObject.getValueType() == ValueType.ARRAY) {
+                    JsonValue comment = jsonObject.get(Constants.RDFS_COMMENT);
+                    if (comment.getValueType() == ValueType.ARRAY) {
                         mdCodeListValue.add("comment",jsonObject.getJsonArray(Constants.RDFS_COMMENT));                                                
-                    } else if (jsonObject.getValueType() == ValueType.STRING) {
+                    } else if (comment.getValueType() == ValueType.STRING) {
                         mdCodeListValue.add("comment",jsonObject.getString(Constants.RDFS_COMMENT));                        
                     } 
                 } else{
                     mdCodeListValue.add("comment","");
+                }
+                if(jsonObject.containsKey(Constants.RDFS_LABEL)){
+                    mdCodeListValue.add("label",jsonObject.getString(Constants.RDFS_LABEL));
                 }
                 mdCodeListValue.add("value",jsonObject.getString(Constants.RDF_VALUE));
                 valuesMap.put(jsonObject.getString(Constants.RDF_VALUE), mdCodeListValue.build());
